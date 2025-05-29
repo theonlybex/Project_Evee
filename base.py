@@ -1,47 +1,69 @@
-import os
-import imageio_ffmpeg as ffmpeg
+# base.py
 
-# Ensure our bundled ffmpeg is used
-ffmpeg_exe = ffmpeg.get_ffmpeg_exe()
+import os
+from pathlib import Path
+import warnings
+
+# ——————————————————————————————————————————————
+# 1) Bundle in the imageio-ffmpeg binary so Whisper finds it
+# ——————————————————————————————————————————————
+import imageio_ffmpeg as iioffmpeg
+
+ffmpeg_exe = iioffmpeg.get_ffmpeg_exe()
 ffmpeg_dir = os.path.dirname(ffmpeg_exe)
 os.environ["PATH"] = ffmpeg_dir + os.pathsep + os.environ.get("PATH", "")
 
-
-import sounddevice as sd
-import numpy as np
-from scipy.io.wavfile import write
-import whisper
-import modules.voice_input as voice_input
-import warnings
-import os
-
-# Suppress the FP16 warning
+# ——————————————————————————————————————————————
+# 2) Suppress that FP16 warning when running on CPU
+# ——————————————————————————————————————————————
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU")
 
-# Recording now
-output_file = "recording.wav"
-voice_input.record_with_pyaudio(output_file)
+# ——————————————————————————————————————————————
+# 3) Your modules & imports
+# ——————————————————————————————————————————————
+from modules.voice_input import record_with_pyaudio
+import whisper
 
-# Check if file exists and has content
-if not os.path.exists(output_file):
-    raise FileNotFoundError(f"Recording file {output_file} was not created")
-if os.path.getsize(output_file) == 0:
-    raise ValueError(f"Recording file {output_file} is empty")
+def main():
+    # Determine paths relative to this script
+    SCRIPT_DIR   = Path(__file__).parent
+    OUTPUT_WAV   = SCRIPT_DIR / "recording.wav"
+    OUTPUT_TXT   = SCRIPT_DIR / "transcription.txt"
 
-print(f"Recording saved to {output_file}")
+    # ——————————————————————————————————————————————
+    # 4) Record audio
+    # ——————————————————————————————————————————————
+    print("Starting recording (5s)...")
+    wav_path = record_with_pyaudio(
+        output_filename=str(OUTPUT_WAV),
+        duration=5,
+        rate=16000       # Whisper expects 16 kHz
+    )
+    print(f"✅ Saved recording to: {wav_path}")
 
-# Transcribe
-print("Transcribing...")
-try:
+    # Sanity-check
+    if not OUTPUT_WAV.exists():
+        raise FileNotFoundError(f"No file at {OUTPUT_WAV}")
+    if OUTPUT_WAV.stat().st_size == 0:
+        raise ValueError(f"File is empty: {OUTPUT_WAV}")
+
+    # ——————————————————————————————————————————————
+    # 5) Load Whisper & transcribe
+    # ——————————————————————————————————————————————
+    print("Loading Whisper model…")
     model = whisper.load_model("base")
-    result = model.transcribe("recording.wav")
-    transcribed_text = result["text"]
-    print("You said:", transcribed_text)
 
-    # Write transcribed text to a file
-    with open("transcription.txt", "w", encoding="utf-8") as f:
-        f.write(transcribed_text)
-    print("Transcription saved to transcription.txt")
-except Exception as e:
-    print(f"Error during transcription: {str(e)}")
-    raise
+    print("Transcribing…")
+    result = model.transcribe(str(OUTPUT_WAV))
+    text = result["text"].strip()
+    print("🎙 You said:", text)
+
+    # ——————————————————————————————————————————————
+    # 6) Save transcription
+    # ——————————————————————————————————————————————
+    with open(OUTPUT_TXT, "w", encoding="utf-8") as f:
+        f.write(text)
+    print(f"✅ Transcription saved to: {OUTPUT_TXT}")
+
+if __name__ == "__main__":
+    main()
