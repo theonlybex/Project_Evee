@@ -5,16 +5,16 @@ import numpy as np
 #recording audio
 def record_audio(filename, rate=16000, channels=1):
     
-    silence_limit = 2  # 2 seconds of silence before stopping
+    silence_limit = 4  # 2 seconds of silence before stopping
     # compute how many blocks constitute the max duration & silence limit
-    max_blocks     = int(rate / 1024 * 30)  # 30 seconds maximum recording time
+    max_blocks     = int(rate / 1024 * 90)  # 30 seconds maximum recording time
     silent_blocks  = int(rate / 1024 * silence_limit)
 
     p = pyaudio.PyAudio()
 
     #open the stream
     stream = p.open(format=pyaudio.paInt16, channels=channels, rate=rate, input=True, frames_per_buffer=1024)
-    print("Recording... (Speak now, recording will stop 2 seconds after you finish)")
+    print("Recording... (Speak now, recording will stop after you finish talking)")
 
     silence_counter = 0
     speaking = False  # Track if we've started speaking
