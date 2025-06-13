@@ -16,11 +16,21 @@ class CodeEngine:
         print("Model loaded successfully!")
         
 
-    def generate_code(self, instruction):
-        """Generate Python code based on the instruction."""
-        prompt = f"""<s>[INST] Write Python code to: {instruction}
-        Use pyautogui, pywinauto, and selenium for automation.
-        Return only the Python code, no explanations. [/INST]"""
+    def generate_code(self):
+
+        # Instructions for the model
+        instruction = """
+        You are a personal in-house POC assistant.
+        Your purpose is to receive text text commands (e.g., "I want to watch some youtube videos")
+        and write python code using pyautogui, pywinauto, selenium to complete the task
+
+
+        """
+        # Read the user command from the text file
+        user_request = open("audiototext.txt", "r").read()
+
+        #creation of the prompt
+        prompt = instruction+ "### User Command:\n" + user_request + "\n\n### Assistant Response (Python Code): \n"
         
         try:
             # Tokenize and generate
