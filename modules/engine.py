@@ -1,17 +1,21 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
+
 class CodeEngine:
     def __init__(self):
         """Initialize the code generation engine."""
         print("Loading model...")
-        self.model_name = "WizardLM/WizardCoder-Python-7B-V1.0"
-        self.tok = AutoTokenizer.from_pretrained(self.model_name)
+        self.model_name = "codellama/CodeLlama-7b-hf"
+        # Replace YOUR_TOKEN_HERE with your actual Hugging Face token
+        self.token = "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"  # Add your token here
+        self.tok = AutoTokenizer.from_pretrained(self.model_name, token=self.token)
         self.model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
             torch_dtype=torch.float16,
             device_map="auto",
-            load_in_4bit=True
+            load_in_4bit=True,
+            token=self.token
         )
         print("Model loaded successfully!")
         
@@ -20,9 +24,9 @@ class CodeEngine:
 
         # Instructions for the model
         instruction = """
-        You are a personal in-house POC assistant.
+        [/INST]You are a personal in-house POC assistant.
         Your purpose is to receive text text commands (e.g., "I want to watch some youtube videos")
-        and write python code using pyautogui, pywinauto, selenium to complete the task
+        and write python code using pyautogui, pywinauto, selenium to complete the task[/INST]
 
 
         """
