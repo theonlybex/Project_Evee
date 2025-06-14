@@ -3,12 +3,11 @@ import torch
 import os
 
 
-class CodeEngine:
+class DeepSeekEngine:
     def __init__(self):
-        """Initialize the code generation engine."""
-        print("Loading model...")
-        self.model_name = "codellama/CodeLlama-7b-hf"
-        # Get token from environment variable instead of hardcoding
+        """Initialize the DeepSeek code generation engine."""
+        print("Loading DeepSeek model...")
+        self.model_name = "deepseek-ai/deepseek-coder-6.7b-base"
         self.token = os.getenv('HF_TOKEN')
         if not self.token:
             raise ValueError("Please set your Hugging Face token as an environment variable named 'HF_TOKEN'")
@@ -21,37 +20,41 @@ class CodeEngine:
             load_in_4bit=True,
             token=self.token
         )
-        print("Model loaded successfully!")
-        
+        print("DeepSeek model loaded successfully!")
 
     def generate_code(self):
-
+        """Generate code based on the user's request."""
         # Instructions for the model
-        instruction = """
-        [/INST]You are a personal in-house POC assistant.
-        Your purpose is to receive text text commands (e.g., "I want to watch some youtube videos")
-        and write python code using pyautogui, pywinauto, selenium to complete the task[/INST]
+        instruction = """You are a personal in-house POC assistant.
+        Your purpose is to receive text commands (e.g., "I want to watch some youtube videos")
+        and write python code using pyautogui, pywinauto, selenium to complete the task.
+        Only return the Python code, no explanations or markdown formatting."""
 
-
-        """
         # Read the user command from the text file
-        user_request = open("audiototext.txt", "r").read()
+        try:
+            with open("audiototext.txt", "r") as f:
+                user_request = f.read()
+        except FileNotFoundError:
+            print("Error: audiototext.txt file not found")
+            return None
 
-        #creation of the prompt
-        prompt = instruction+ "### User Command:\n" + user_request + "\n\n### Assistant Response (Python Code): \n"
-        
+        # Create the prompt
+        prompt = f"{instruction}\n\nUser Command: {user_request}\n\nPython Code:"
+
         try:
             # Tokenize and generate
             inputs = self.tok(prompt, return_tensors="pt").to(self.model.device)
             out = self.model.generate(
-                **inputs, 
-                max_new_tokens=256, 
-                temperature=0.1
+                **inputs,
+                max_new_tokens=512,
+                temperature=0.1,
+                top_p=0.95,
+                do_sample=True
             )
             code = self.tok.decode(out[0], skip_special_tokens=True)
             
             # Extract only the code part after the instruction
-            code = code.split("[/INST]")[-1].strip()
+            code = code.split("Python Code:")[-1].strip()
             return code
             
         except Exception as e:

@@ -2,7 +2,7 @@ import warnings
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU")
 import os
 from modules import voice_input as recording
-from modules.engine import CodeEngine
+from modules.deepseek_api_engine import DeepSeekAPIEngine
 import whisper
 
 #main file
@@ -24,10 +24,10 @@ if __name__ == "__main__":
             f.write(text)
         print("Transcription saved to audiototext.txt")
         
-        # Generate automation code using CodeEngine
+        # Generate automation code using DeepSeek API Engine
         print("\nGenerating automation code...")
-        engine = CodeEngine()
-        code = engine.generate_code(text)
+        engine = DeepSeekAPIEngine()
+        code = engine.generate_code()
         
         if code:
             if engine.save_code(code):
