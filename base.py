@@ -4,6 +4,7 @@ import os
 from modules import voice_input as recording
 from modules.deepseek_api_engine import DeepSeekAPIEngine
 import whisper
+import automation_code
 
 #main file
 if __name__ == "__main__":
@@ -35,5 +36,11 @@ if __name__ == "__main__":
                 print("-" * 50)
                 print(code)
                 print("-" * 50)
+            #try to exec generated code
+            #try:
+                #exec(automation_code.py)
+            #except Exception as e:
+               # print(f"Automation Code could not be executed{str(e)}")
+
     else:
         print(f"{filename} does not exist.")

@@ -11,7 +11,7 @@ model = AutoModelForCasualLM.from_pretrained(
     device_map="auto"
 )
 
-# Instrcutions for the model
+# Instructions for the model
 instruction_prefix = """
 You are a personal in-house POC assistant.
 Your purpose is to receive text text commands (e.g., "I want to watch some youtube videos")
@@ -31,7 +31,7 @@ out = model.generate(**inputs, max_new_tokens=256, temperature=0.1)
 code = tok.decode(out[0], skip_special_tokens=True)
 
 # Save the code to a file
-filename = "codeGen.py"
+filename = "GUI.py"
 with open(filename, "w", encoding="utf-8") as f:
     f.write(code)
 

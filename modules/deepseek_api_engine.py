@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+import re
 
 
 class DeepSeekAPIEngine:
@@ -17,13 +18,24 @@ class DeepSeekAPIEngine:
         }
         print("DeepSeek API engine initialized successfully!")
 
+    def clean_code(self, text):
+        """Clean the response to extract only Python code."""
+        # Remove markdown code block markers
+        text = re.sub(r'```python\s*', '', text)
+        text = re.sub(r'```\s*$', '', text)
+        
+        # Remove any leading/trailing whitespace
+        text = text.strip()
+        
+        return text
+
     def generate_code(self):
         """Generate code based on the user's request."""
         # Instructions for the model
         instruction = """You are a personal in-house POC assistant.
         Your purpose is to receive text commands (e.g., "I want to watch some youtube videos")
         and write python code using pyautogui, pywinauto, selenium to complete the task.
-        Only return the Python code, no explanations or markdown formatting."""
+        Return ONLY the Python code, no explanations, no markdown formatting, no ```python markers."""
 
         # Read the user command from the text file
         try:
@@ -56,6 +68,9 @@ class DeepSeekAPIEngine:
             # Parse the response
             result = response.json()
             code = result['choices'][0]['message']['content'].strip()
+            
+            # Clean the code
+            code = self.clean_code(code)
             return code
             
         except requests.exceptions.RequestException as e:
