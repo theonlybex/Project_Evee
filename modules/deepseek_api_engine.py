@@ -35,7 +35,7 @@ class DeepSeekAPIEngine:
         instruction = """You are a personal in-house POC assistant.
         Your purpose is to receive text commands (e.g., "I want to watch some youtube videos")
         and write python code using pyautogui, pywinauto, selenium to complete the task.
-        Return ONLY the Python code, no explanations, no markdown formatting, no ```python markers."""
+        Return ONLY the Python code, no explanations, no markdown formatting, no comments, no text before or after the code."""
 
         # Read the user command from the text file
         try:
