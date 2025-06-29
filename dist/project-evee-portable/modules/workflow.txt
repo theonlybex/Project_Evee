@@ -1,0 +1,37 @@
+Client Side (User’s Machine)
+
+    Voice Recording & Whisper Transcription
+
+    If the user has a reasonable CPU (or a small GPU), run Whisper locally so that the raw audio never leaves their device.
+
+    If they don’t, fall back to sending compressed audio → server for transcription.
+
+    Executor (UI Automation)
+
+    All actions that click/type on the user’s OS must run on their machine (PyAutoGUI, PyWinAuto, etc.), so that Evee can actually control Chrome, Notepad, or any local app.
+
+    Feedback / TTS
+
+    Use pyttsx3 or gTTS on the client for spoken responses—no server round-trip needed.
+
+Server Side (Your Hosted Service)
+
+    LLM Clarification
+
+    The client sends only the transcribed text (e.g. "Open YouTube and search coding music").
+
+    The server runs Mistral 3 B (or another instruction model) in 4-bit quant on a GPU, and returns back something like:
+
+    json
+    Copy
+    Edit
+    { "type": "confirm", "summary": "Open Chrome and search YouTube for coding music" }
+    If the user’s command was ambiguous (e.g. “Play that song”), the server instead returns:
+
+    json
+    Copy
+    Edit
+    { "type": "clarify", "question": "Which song do you want me to play?" }
+    Optional Logging / Monitoring
+
+You can keep anonymized logs (transcripts only, no raw audio) to debug behavior or improve prompts over time.

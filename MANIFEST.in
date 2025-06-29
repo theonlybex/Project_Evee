@@ -1,0 +1,19 @@
+include README.md
+include requirements.txt
+include LICENSE
+include MANIFEST.in
+include setup.py
+include installer.py
+include main_gui.py
+include base.py
+include automation_code.py
+recursive-include modules *.py
+recursive-include modules *.txt
+include *.txt
+include *.json
+exclude recording.wav
+exclude audiototext.txt
+exclude settings.json
+exclude __pycache__
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co] 
