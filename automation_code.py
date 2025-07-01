@@ -1,2 +1,2 @@
-import sys
-sys.exit()
+import webbrowser
+webbrowser.open('https://www.youtube.com')
