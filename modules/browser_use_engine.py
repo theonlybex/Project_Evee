@@ -9,10 +9,10 @@ from browser_use.llm import ChatOpenAI
 class Engine:
     def __init__(self):
        # Initialize OpenAI API and browser
-       self.llm = ChatOpenAI(model="gpt-4o-mini", api_key = os.getenv("OPENAI_API_KEY"))
+       self.llm = ChatOpenAI(model="gpt-4o", api_key = os.getenv("OPENAI_API_KEY"))
        self.browser = Browser()
 
-    async def execute_voice_command(self):
+    async def executeCommand(self):
         # Read from audiototext file
         try:
             with open("audiototext.txt", "r") as file:
