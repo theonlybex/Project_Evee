@@ -1,5 +1,6 @@
 # Browser-use_engine - This module is used to control the browser using voice commands!
 import os
+import json
 import asyncio
 from dotenv import load_dotenv
 load_dotenv()
@@ -9,8 +10,27 @@ from browser_use.llm import ChatOpenAI
 class Engine:
     def __init__(self):
        # Initialize OpenAI API and browser
-       self.llm = ChatOpenAI(model="gpt-4o", api_key = os.getenv("OPENAI_API_KEY"))
-       self.browser = Browser()
+       self.llm = ChatOpenAI(
+           model="gpt-4o-mini", 
+           api_key = os.getenv("OPENAI_API_KEY"),
+           temperature = 0.0,  # Faster responses
+           )
+       self.browser = Browser(
+           browser_kwargs = {
+               'headless': True,  # Much faster - no GUI rendering
+               'slow_mo': 0,      # Remove all delays for maximum speed
+               'args': [
+                   '--window-size=600,400', 
+                   '--window-position=100,100',
+                   '--disable-images',        # Don't load images for speed
+                   '--disable-javascript',    # Disable JS if not needed
+                   '--disable-plugins',       # Disable plugins
+                   '--disable-extensions',    # Disable extensions
+                   '--no-sandbox',           # Faster startup
+                   '--disable-dev-shm-usage' # Better performance
+               ]
+               }
+       )
 
     async def executeCommand(self):
         # Read from audiototext file
@@ -20,16 +40,34 @@ class Engine:
         except FileNotFoundError:
             return "error: File not found"
 
-        # Call for an agent with command
-        agent = Agent(task=text,llm=self.llm, browser = self.browser)
+        # Call for an agent with command - optimized for speed
+        agent = Agent(
+            task=text, 
+            llm=self.llm, 
+            browser = self.browser,
+            use_vision = False,          # Already optimized - no vision processing
+            max_actions_per_step = 5,    # Limit actions per step for efficiency
+            )
 
         # Run agent
-        await agent.run()
+        history = await agent.run()
 
         # Return status (success or failure)
-        return "Success"
+        results = {
+            'success': True,
+            'urls_visited': history.urls() if hasattr(history, 'urls') else [],
+            'extracted_content': history.extracted_content() if hasattr(history, 'extracted_content') else [],
+            'final_result': history.final_result() if hasattr(history, 'final_result') else None,
+        }
+        
+        # Auto-save results
+        self.save_results(results)
+        return results 
 
-    def save_results(self):
+    def save_results(self, results):
         # Log for results
         # Save to a file
-        pass
+        with open("results.json", "w") as file:
+           json.dump(results, file, indent=2)
+        print("Results saved to results.json") 
+        
