@@ -7,7 +7,7 @@ def record_audio(filename, rate=16000, channels=1):
     
     silence_limit = 4  # 2 seconds of silence before stopping
     # compute how many blocks constitute the max duration & silence limit
-    max_blocks     = int(rate / 1024 * 90)  # 30 seconds maximum recording time
+    max_blocks     = int(rate / 1024 * 360)  # 120 seconds (2 minutes) maximum recording time
     silent_blocks  = int(rate / 1024 * silence_limit)
 
     p = pyaudio.PyAudio()
