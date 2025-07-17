@@ -82,21 +82,8 @@ class VoiceAutomationGUI:
         self.progress = ttk.Progressbar(left_frame, mode='indeterminate')
         self.progress.pack(fill='x', padx=10, pady=5)
         
-        # Generate Code button
-        self.generate_btn = tk.Button(left_frame, text="🤖 Generate Code", 
-                                     command=self.generate_automation_code,
-                                     bg='#2196F3', fg='white', 
-                                     font=('Arial', 12, 'bold'),
-                                     width=15, height=2)
-        self.generate_btn.pack(pady=10)
-        
-        # Execute Code button
-        self.execute_btn = tk.Button(left_frame, text="▶️ Execute Code", 
-                                    command=self.execute_generated_code,
-                                    bg='#FF9800', fg='white', 
-                                    font=('Arial', 12, 'bold'),
-                                    width=15, height=2)
-        self.execute_btn.pack(pady=10)
+        # Note: Execute Command button removed - now happens automatically after voice recording
+        # The workflow is now: Record Voice → Transcribe → Auto-Execute (with confirmation)
         
         # Save Code button
         self.save_btn = tk.Button(left_frame, text="💾 Save Code", 
@@ -210,6 +197,9 @@ class VoiceAutomationGUI:
                     
                     self.add_to_history(f"Transcription: {text}")
                     self.update_status("Transcription complete")
+                    
+                    # Automatically execute the command after transcription
+                    self.root.after(1000, self.generate_automation_code)  # Small delay to show transcription
                 else:
                     self.update_status("Recording failed")
                     messagebox.showerror("Error", "Recording failed!")
@@ -235,7 +225,7 @@ class VoiceAutomationGUI:
         self.notebook.select(0)  # Switch to transcription tab
     
     def generate_automation_code(self):
-        """Generate automation code from transcription"""
+        """Generate and execute automation code with confirmation"""
         if not self.current_transcription:
             messagebox.showwarning("Warning", "No transcription available. Please record audio first.")
             return
@@ -244,28 +234,47 @@ class VoiceAutomationGUI:
             messagebox.showwarning("Warning", "DeepSeek engine not initialized. Please wait...")
             return
         
-        self.update_status("Generating automation code...")
+        # Show confirmation dialog
+        result = messagebox.askyesno(
+            "Confirm Command", 
+            f'Execute: "{self.current_transcription}"?',
+            icon='question'
+        )
+        
+        if not result:
+            self.update_status("Command cancelled.")
+            return
+        
+        self.update_status(f"Executing Command: {self.current_transcription}")
         self.progress.start()
         
-        def generate_code():
+        def generate_and_execute():
             try:
+                # Generate code
                 code = self.deepseek_engine.generate_code()
                 if code:
                     self.generated_code = code
-                    self.root.after(0, self.display_generated_code)
-                    self.add_to_history(f"Generated code for: {self.current_transcription}")
-                    self.update_status("Code generation complete")
+                    
+                    # Save code to file
+                    with open("automation_code.py", "w", encoding="utf-8") as f:
+                        f.write(code)
+                    
+                    # Execute immediately
+                    exec(code)
+                    
+                    self.root.after(0, lambda: self.display_generated_code())
+                    self.add_to_history(f"Executed: {self.current_transcription}")
+                    self.root.after(0, lambda: self.update_status("✅ Command executed successfully!"))
                 else:
-                    self.update_status("Code generation failed")
-                    messagebox.showerror("Error", "Failed to generate code!")
+                    self.root.after(0, lambda: self.update_status("❌ Could not generate automation for this command."))
                     
             except Exception as e:
-                self.update_status("Code generation error")
-                messagebox.showerror("Error", f"Code generation error: {e}")
+                error_msg = f"❌ Command failed: {str(e)}"
+                self.root.after(0, lambda: self.update_status(error_msg))
             finally:
-                self.progress.stop()
+                self.root.after(0, lambda: self.progress.stop())
         
-        threading.Thread(target=generate_code, daemon=True).start()
+        threading.Thread(target=generate_and_execute, daemon=True).start()
     
     def display_generated_code(self):
         """Display generated code in the text widget"""
@@ -273,40 +282,8 @@ class VoiceAutomationGUI:
         self.code_text.insert(1.0, self.generated_code)
         self.notebook.select(1)  # Switch to code tab
     
-    def execute_generated_code(self):
-        """Execute the generated code"""
-        if not self.generated_code:
-            messagebox.showwarning("Warning", "No code generated yet. Please generate code first.")
-            return
-        
-        # Confirm execution
-        result = messagebox.askyesno("Confirm Execution", 
-                                   "Are you sure you want to execute the generated code?\n\n" +
-                                   "This will perform automated actions on your computer.")
-        if not result:
-            return
-        
-        self.update_status("Executing code...")
-        
-        def execute_code():
-            try:
-                # Save code to file first
-                with open("automation_code.py", "w", encoding="utf-8") as f:
-                    f.write(self.generated_code)
-                
-                # Execute the code
-                exec(self.generated_code)
-                self.add_to_history(f"Executed: {self.current_transcription}")
-                self.update_status("Code executed successfully")
-                messagebox.showinfo("Success", "Code executed successfully!")
-                
-            except Exception as e:
-                self.update_status("Execution error")
-                error_msg = f"Execution error: {str(e)}"
-                self.add_to_history(f"Execution failed: {error_msg}")
-                messagebox.showerror("Execution Error", error_msg)
-        
-        threading.Thread(target=execute_code, daemon=True).start()
+    # Note: execute_generated_code method removed - 
+    # Execution now happens automatically after confirmation in generate_automation_code()
     
     def save_code(self):
         """Save generated code to a file"""

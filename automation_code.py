@@ -1,17 +1,7 @@
-import pyautogui
+import webbrowser
 import time
+import pyautogui
 
-# Open the Start menu
-pyautogui.hotkey('winleft')
-time.sleep(1)
-
-# Type "Word" to search for Microsoft Word
-pyautogui.write('Word')
-time.sleep(1)
-
-# Press Enter to open Microsoft Word
-pyautogui.press('enter')
+webbrowser.open("https://www.youtube.com/results?search_query=CSGO")
 time.sleep(3)
-
-# Wait for Word to open and create a new document
-pyautogui.hotkey('ctrl', 'n')
+pyautogui.click(x=500, y=300)
