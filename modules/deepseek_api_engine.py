@@ -2,14 +2,20 @@ import os
 import requests
 import json
 import re
+from .file_manager import get_file_manager
 
 
 class DeepSeekAPIEngine:
     def __init__(self):
         """Initialize the DeepSeek API engine."""
         print("Initializing DeepSeek API engine...")
-        # Using API key directly for testing
-        self.api_key = "sk-49d740ae018f48f7812efa9af1bbd981"
+        
+        # Initialize file manager
+        self.file_manager = get_file_manager()
+        
+        # Load API key from settings
+        settings = self.file_manager.load_settings()
+        self.api_key = settings.get("api_key", "sk-49d740ae018f48f7812efa9af1bbd981")
         
         self.api_url = "https://api.deepseek.com/v1/chat/completions"
         self.headers = {
@@ -37,12 +43,10 @@ class DeepSeekAPIEngine:
         and write python code using pyautogui, pywinauto, selenium to complete the task.
         Return ONLY the Python code, no explanations, no markdown formatting, no comments, no text before or after the code."""
 
-        # Read the user command from the text file
-        try:
-            with open("audiototext.txt", "r") as f:
-                user_request = f.read()
-        except FileNotFoundError:
-            print("Error: audiototext.txt file not found")
+        # Read the user command from the file manager
+        user_request = self.file_manager.load_transcription()
+        if not user_request:
+            print("Error: No transcription available. Please record audio first.")
             return None
 
         # Prepare the API request

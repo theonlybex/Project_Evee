@@ -6,10 +6,14 @@ import asyncio
 from modules.whisper_engine import WhisperEngine
 from modules.browser_use_engine import Engine
 from modules import voice_input as recording
+from modules.file_manager import get_file_manager
 
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU")
 
 async def main():
+    # Initialize file manager
+    file_manager = get_file_manager()
+    
     whisper_obj = WhisperEngine("base")
     whisper_obj.load_model()
     engine_obj = Engine()
@@ -29,8 +33,7 @@ async def main():
             print("Recording stopped")
             if result:
                 print(f"You asked the following: {result['text']}")
-                with open("audiototext.txt", "w") as file:
-                    file.write(result['text'])
+                file_manager.save_transcription(result['text'])
         elif user_input == "e":
             print("Stopping recording...")
             print("--------------------------------")

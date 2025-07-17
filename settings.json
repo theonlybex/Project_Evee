@@ -1,0 +1,5 @@
+{
+  "api_key": "sk-49d740ae018f48f7812efa9af1bbd981",
+  "silence_timeout": 4,
+  "whisper_model": "base"
+}

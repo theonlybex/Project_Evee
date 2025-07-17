@@ -1,15 +1,24 @@
 import os
 from openai import OpenAI
+from .file_manager import get_file_manager
 
 
 class OpenAICodeEngine:
     def __init__(self):
         """Initialize the OpenAI code generation engine."""
         print("Initializing OpenAI engine...")
-        # Get API key from environment variable
+        
+        # Initialize file manager
+        self.file_manager = get_file_manager()
+        
+        # Get API key from environment variable or settings
         self.api_key = os.getenv('OPENAI_API_KEY')
         if not self.api_key:
-            raise ValueError("Please set your OpenAI API key as an environment variable named 'OPENAI_API_KEY'")
+            settings = self.file_manager.load_settings()
+            self.api_key = settings.get("openai_api_key", "")
+        
+        if not self.api_key:
+            raise ValueError("Please set your OpenAI API key in settings or as environment variable 'OPENAI_API_KEY'")
         
         self.client = OpenAI(api_key=self.api_key)
         print("OpenAI engine initialized successfully!")
@@ -22,12 +31,10 @@ class OpenAICodeEngine:
         and write python code using pyautogui, pywinauto, selenium to complete the task.
         Only return the Python code, no explanations or markdown formatting."""
 
-        # Read the user command from the text file
-        try:
-            with open("audiototext.txt", "r") as f:
-                user_request = f.read()
-        except FileNotFoundError:
-            print("Error: audiototext.txt file not found")
+        # Read the user command from the file manager
+        user_request = self.file_manager.load_transcription()
+        if not user_request:
+            print("Error: No transcription available. Please record audio first.")
             return None
 
         # Create the prompt

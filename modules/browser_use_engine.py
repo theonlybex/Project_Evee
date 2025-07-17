@@ -6,9 +6,13 @@ from dotenv import load_dotenv
 load_dotenv()
 from browser_use import Agent, BrowserSession
 from browser_use.llm import ChatOpenAI
+from .file_manager import get_file_manager
 
 class Engine:
     def __init__(self):
+       # Initialize file manager
+       self.file_manager = get_file_manager()
+       
        # Initialize OpenAI API and browser session
        self.llm = ChatOpenAI(
            model="gpt-4o-mini", 
@@ -34,12 +38,10 @@ class Engine:
        )
 
     async def executeCommand(self):
-        # Read from audiototext file
-        try:
-            with open("audiototext.txt", "r") as file:
-                text = file.read()
-        except FileNotFoundError:
-            return "error: File not found"
+        # Read from file manager
+        text = self.file_manager.load_transcription()
+        if not text:
+            return "error: No transcription available"
 
         # Create agent with the configured browser session
         agent = Agent(
@@ -67,8 +69,9 @@ class Engine:
 
     def save_results(self, results):
         # Log for results
-        # Save to a file
-        with open("results.json", "w") as file:
-           json.dump(results, file, indent=2)
-        print("Results saved to results.json") 
+        # Save to a file using file manager
+        if self.file_manager.save_results(results):
+            print("Results saved successfully")
+        else:
+            print("Failed to save results") 
         

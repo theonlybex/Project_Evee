@@ -1,12 +1,17 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import os
+from .file_manager import get_file_manager
 
 
 class CodeEngine:
     def __init__(self):
         """Initialize the code generation engine."""
         print("Loading model...")
+        
+        # Initialize file manager
+        self.file_manager = get_file_manager()
+        
         self.model_name = "codellama/CodeLlama-7b-hf"
         # Get token from environment variable instead of hardcoding
         self.token = os.getenv('HF_TOKEN')
@@ -34,8 +39,11 @@ class CodeEngine:
 
 
         """
-        # Read the user command from the text file
-        user_request = open("audiototext.txt", "r").read()
+        # Read the user command from the file manager
+        user_request = self.file_manager.load_transcription()
+        if not user_request:
+            print("Error: No transcription available. Please record audio first.")
+            return None
 
         #creation of the prompt
         prompt = instruction+ "### User Command:\n" + user_request + "\n\n### Assistant Response (Python Code): \n"

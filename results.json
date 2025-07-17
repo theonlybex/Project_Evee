@@ -1,20 +1,33 @@
 {
-  "success": true,
-  "urls_visited": [
-    "about:blank",
-    "https://www.google.com/search?q=Python%20courses&udm=14&sei=_T94aOaYM7LI0PEP4O-c0QM",
-    "https://www.google.com/search?q=Python%20courses&udm=14&sei=_T94aOaYM7LI0PEP4O-c0QM",
-    "https://www.udemy.com/topic/python/",
-    "https://www.udemy.com/topic/python/",
-    "https://www.udemy.com/topic/python/"
+  "text": "Hello EV, could you please open YouTube for me?",
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 0.0,
+      "end": 4.0,
+      "text": " Hello EV, could you please open YouTube for me?",
+      "tokens": [
+        50364,
+        2425,
+        15733,
+        11,
+        727,
+        291,
+        1767,
+        1269,
+        3088,
+        337,
+        385,
+        30,
+        50564
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.5718276841299874,
+      "compression_ratio": 0.8545454545454545,
+      "no_speech_prob": 0.08726311475038528
+    }
   ],
-  "extracted_content": [
-    "\ud83d\udd0d  Searched for \"Python courses\" in Google",
-    "Page Link: https://www.google.com/search?q=Python%20courses&udm=14&sei=_T94aOaYM7LI0PEP4O-c0QM\nQuery: Extract information about Python courses from the search results.\nExtracted Content:\n```json\n{\n  \"response\": {\n    \"message\": \"The requested information about Python courses is not available on the provided webpage. The page is a Google search results page for 'Python courses' and does not contain specific details about the courses themselves. Instead, it lists various links to external resources where Python courses can be found, such as Codecademy, Coursera, and others. For detailed information about specific Python courses, you would need to visit those external links.\"\n  }\n}\n```",
-    "\ud83d\udd17  Opened new tab #2 with url https://www.udemy.com/topic/python/",
-    "Page Link: https://www.udemy.com/topic/python/\nQuery: Extract information about Python courses from the Udemy page.\nExtracted Content:\n```json\n{\n  \"response\": {\n    \"message\": \"The requested information about Python courses from the Udemy page is available. The page provides details about various Python courses, including their ratings, prices, and instructors. However, the specific details of the courses are not fully extracted in this response. The page mentions that there are 3,290 Python courses available, with an average rating of 4.5. Two highlighted courses include 'The Complete Python Bootcamp From Zero to Hero in Python' and 'Deep Learning Prerequisites: The Numpy Stack in Python (V2+)', along with their respective ratings, prices, and instructors. For more detailed information, please refer to the Udemy page directly.\"\n  }\n}\n```",
-    "Data written to file results.md successfully.",
-    "I have found and summarized information about Python courses. There are a total of 3,290 courses available on Udemy with an average rating of 4.5. The highlighted course is 'The Complete Python Bootcamp From Zero to Hero in Python' priced at $29.99. For more details, please refer to the results file.\n\nAttachments:\n\nresults.md:\n# Summary of Python Courses\n\n## Total Courses Available: 3,290\n\n## Average Rating: 4.5\n\n### Highlighted Courses:\n1. **The Complete Python Bootcamp From Zero to Hero in Python**\n   - **Rating:** 4.6 (541,531 reviews)\n   - **Current Price:** $29.99 (Original Price: $199.99)\n   - **Instructor:** Jose Portilla, Pierian Training\n\n2. **Deep Learning Prerequisites: The Numpy Stack in Python (V2+)**\n   - **Rating:** 4.6 (22,055 reviews)\n   - **Current Price:** $14.99 (Original Price: $94.99)\n   - **Instructor:** Lazy Programmer Inc., Lazy Programmer Team\n\nFor more detailed information, please refer to the [Udemy Python Courses Page](https://www.udemy.com/topic/python/)."
-  ],
-  "final_result": "I have found and summarized information about Python courses. There are a total of 3,290 courses available on Udemy with an average rating of 4.5. The highlighted course is 'The Complete Python Bootcamp From Zero to Hero in Python' priced at $29.99. For more details, please refer to the results file.\n\nAttachments:\n\nresults.md:\n# Summary of Python Courses\n\n## Total Courses Available: 3,290\n\n## Average Rating: 4.5\n\n### Highlighted Courses:\n1. **The Complete Python Bootcamp From Zero to Hero in Python**\n   - **Rating:** 4.6 (541,531 reviews)\n   - **Current Price:** $29.99 (Original Price: $199.99)\n   - **Instructor:** Jose Portilla, Pierian Training\n\n2. **Deep Learning Prerequisites: The Numpy Stack in Python (V2+)**\n   - **Rating:** 4.6 (22,055 reviews)\n   - **Current Price:** $14.99 (Original Price: $94.99)\n   - **Instructor:** Lazy Programmer Inc., Lazy Programmer Team\n\nFor more detailed information, please refer to the [Udemy Python Courses Page](https://www.udemy.com/topic/python/)."
+  "language": "en",
+  "audio_file": "audio.wav"
 }

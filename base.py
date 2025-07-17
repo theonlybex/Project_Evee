@@ -12,6 +12,7 @@ warnings.filterwarnings("ignore", message="FP16 is not supported on CPU")
 try:
     from modules import voice_input as recording
     from modules.deepseek_api_engine import DeepSeekAPIEngine
+    from modules.file_manager import get_file_manager
     import whisper
 except ImportError as e:
     messagebox.showerror("Import Error", f"Required modules not found: {e}\nPlease install dependencies first.")
@@ -29,6 +30,9 @@ class VoiceAutomationGUI:
         self.deepseek_engine = None
         self.current_transcription = ""
         self.generated_code = ""
+        
+        # Initialize file manager
+        self.file_manager = get_file_manager()
         
         # Load whisper model in background
         self.load_models()
@@ -191,9 +195,8 @@ class VoiceAutomationGUI:
                     self.current_transcription = text
                     self.root.after(0, self.display_transcription)
                     
-                    # Save to file
-                    with open("audiototext.txt", "w", encoding="utf-8") as f:
-                        f.write(text)
+                    # Save to file using file manager
+                    self.file_manager.save_transcription(text)
                     
                     self.add_to_history(f"Transcription: {text}")
                     self.update_status("Transcription complete")
@@ -255,9 +258,8 @@ class VoiceAutomationGUI:
                 if code:
                     self.generated_code = code
                     
-                    # Save code to file
-                    with open("automation_code.py", "w", encoding="utf-8") as f:
-                        f.write(code)
+                    # Save code to file using file manager
+                    self.file_manager.save_automation_code(code)
                     
                     # Execute immediately
                     exec(code)
@@ -316,20 +318,20 @@ class VoiceAutomationGUI:
     def load_settings(self):
         """Load settings from file"""
         try:
-            if os.path.exists("settings.json"):
-                with open("settings.json", "r") as f:
-                    settings = json.load(f)
-                # Apply settings here if needed
+            settings = self.file_manager.load_settings()
+            # Apply settings here if needed
+            return settings
         except Exception as e:
             print(f"Failed to load settings: {e}")
+            return {}
     
     def save_settings(self, settings):
         """Save settings to file"""
-        try:
-            with open("settings.json", "w") as f:
-                json.dump(settings, f, indent=2)
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to save settings: {e}")
+        if self.file_manager.save_settings(settings):
+            return True
+        else:
+            messagebox.showerror("Error", "Failed to save settings")
+            return False
     
     def open_settings(self):
         """Open settings dialog"""
@@ -371,9 +373,11 @@ class VoiceAutomationGUI:
                 "api_key": new_api_key,
                 "silence_timeout": timeout_var.get()
             }
-            self.save_settings(settings)
-            messagebox.showinfo("Success", "Settings saved!")
-            settings_window.destroy()
+            if self.save_settings(settings):
+                messagebox.showinfo("Success", "Settings saved!")
+                settings_window.destroy()
+            else:
+                messagebox.showerror("Error", "Failed to save settings!")
         
         save_btn = tk.Button(settings_window, text="Save Settings", 
                            command=save_settings,
