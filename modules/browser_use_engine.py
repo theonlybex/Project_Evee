@@ -4,32 +4,33 @@ import json
 import asyncio
 from dotenv import load_dotenv
 load_dotenv()
-from browser_use import Agent, Browser
+from browser_use import Agent, BrowserSession
 from browser_use.llm import ChatOpenAI
 
 class Engine:
     def __init__(self):
-       # Initialize OpenAI API and browser
+       # Initialize OpenAI API and browser session
        self.llm = ChatOpenAI(
            model="gpt-4o-mini", 
            api_key = os.getenv("OPENAI_API_KEY"),
            temperature = 0.0,  # Faster responses
            )
-       self.browser = Browser(
-           browser_kwargs = {
-               'headless': True,  # Much faster - no GUI rendering
-               'slow_mo': 0,      # Remove all delays for maximum speed
-               'args': [
-                   '--window-size=600,400', 
-                   '--window-position=100,100',
-                   '--disable-images',        # Don't load images for speed
-                   '--disable-javascript',    # Disable JS if not needed
-                   '--disable-plugins',       # Disable plugins
-                   '--disable-extensions',    # Disable extensions
-                   '--no-sandbox',           # Faster startup
-                   '--disable-dev-shm-usage' # Better performance
-               ]
-               }
+       
+       # Configure browser using browser_use's BrowserSession
+       self.browser_session = BrowserSession(
+           headless=False,                    # Run in background (no visible window)
+           window_size={"width": 1920, "height": 1080},  # Window size (browser_use format)
+           viewport={"width": 1920, "height": 1080},     # Viewport size
+           slow_mo=0,                        # No delays for speed
+           # Performance optimizations
+           args=[
+               '--disable-images',           # Don't load images for speed
+               '--disable-javascript',       # Disable JS if not needed
+               '--disable-plugins',          # Disable plugins
+               '--disable-extensions',       # Disable extensions
+               '--no-sandbox',              # Faster startup
+               '--disable-dev-shm-usage'    # Better performance
+           ]
        )
 
     async def executeCommand(self):
@@ -40,13 +41,13 @@ class Engine:
         except FileNotFoundError:
             return "error: File not found"
 
-        # Call for an agent with command - optimized for speed
+        # Create agent with the configured browser session
         agent = Agent(
             task=text, 
             llm=self.llm, 
-            browser = self.browser,
-            use_vision = False,          # Already optimized - no vision processing
-            max_actions_per_step = 5,    # Limit actions per step for efficiency
+            browser_session=self.browser_session,
+            use_vision=False,                # Disable vision for speed
+            max_actions_per_step=5,          # Limit actions for efficiency
             )
 
         # Run agent
