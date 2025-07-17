@@ -118,8 +118,9 @@ pause
         # Create run script for development
         run_script = dist_dir / "RUN_DEV.bat"
         run_content = """@echo off
-title Project Evee - Development Mode
-python main_gui.py
+title Project Evee - Development Mode (DeepSeek GUI)
+echo Starting Project Evee - DeepSeek GUI Version...
+python base.py
 pause
 """
         with open(run_script, 'w') as f:
@@ -238,8 +239,8 @@ section "install"
     file /r "dist\\project-evee-portable\\*"
     
     # Create shortcuts
-    createShortCut "$SMPROGRAMS\\${APPNAME}.lnk" "$INSTDIR\\main_gui.py" "" "$INSTDIR\\icon.ico"
-    createShortCut "$DESKTOP\\${APPNAME}.lnk" "$INSTDIR\\main_gui.py" "" "$INSTDIR\\icon.ico"
+    createShortCut "$SMPROGRAMS\\${APPNAME}.lnk" "$INSTDIR\\base.py" "" "$INSTDIR\\icon.ico"
+    createShortCut "$DESKTOP\\${APPNAME}.lnk" "$INSTDIR\\base.py" "" "$INSTDIR\\icon.ico"
     
     # Registry information for add/remove programs
     WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APPNAME}" "DisplayName" "${APPNAME}"

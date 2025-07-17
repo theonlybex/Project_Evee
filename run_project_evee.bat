@@ -1,6 +1,6 @@
 @echo off
-title Project Evee - Voice Automation Assistant
-echo Starting Project Evee...
+title Project Evee - Voice Automation Assistant (DeepSeek GUI Version)
+echo Starting Project Evee - DeepSeek GUI Version...
 echo.
 
 REM Check if Python is available
@@ -14,18 +14,32 @@ if errorlevel 1 (
 )
 
 REM Check if required files exist
-if not exist "main_gui.py" (
-    echo Error: main_gui.py not found
+if not exist "base.py" (
+    echo Error: base.py not found
     echo Please make sure you're running this from the Project Evee directory
     echo.
     pause
     exit /b 1
 )
 
-REM Start the application
-python main_gui.py
+REM Check if DeepSeek module exists
+if not exist "modules\deepseek_api_engine.py" (
+    echo Error: DeepSeek API engine not found
+    echo Please make sure all modules are installed
+    echo.
+    pause
+    exit /b 1
+)
+
+REM Start the DeepSeek GUI application
+echo Starting Project Evee with DeepSeek AI Engine and Windows GUI...
+python base.py
 
 REM If we get here, the application has closed
 echo.
-echo Project Evee has closed.
+echo Project Evee (DeepSeek GUI Version) has closed.
+echo.
+echo Note: For the new terminal-based browser automation version, run:
+echo   python main_gui.py
+echo.
 pause 

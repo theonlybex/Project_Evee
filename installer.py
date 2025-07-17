@@ -147,9 +147,10 @@ class ProjectEveeInstaller:
         print("\nCreating launcher script...")
         
         launcher_content = f'''@echo off
-title Project Evee - Voice Automation Assistant
+title Project Evee - Voice Automation Assistant (DeepSeek GUI Version)
 cd /d "{self.install_dir}"
-python main_gui.py
+echo Starting Project Evee - DeepSeek GUI Version...
+python base.py
 pause
 '''
         
@@ -157,11 +158,11 @@ pause
         try:
             with open(launcher_path, 'w') as f:
                 f.write(launcher_content)
-            print("✅ Launcher script created")
-            return str(launcher_path)
+            print("✅ Launcher script created (DeepSeek GUI Version)")
+            return True
         except Exception as e:
-            print(f"❌ Failed to create launcher: {e}")
-            return None
+            print(f"❌ Failed to create launcher script: {e}")
+            return False
     
     def create_desktop_shortcut(self, launcher_path):
         """Create desktop shortcut (Windows)"""
