@@ -39,14 +39,14 @@ async def main():
             print("--------------------------------")
             print("Executing command...")
             print("--------------------------------")
-            await engine_obj.executeCommand()
+            browser_result = await engine_obj.executeCommand()
             print("Saving results...")
-            engine_obj.save_results(result)
+            engine_obj.save_results(browser_result)
             print("--------------------------------")
             print("Command executed")
             print("--------------------------------")
             print("Final result:")
-            print(result.final_result())
+            print(browser_result.get('final_result', 'No final result available'))
             break
         elif user_input == "q":
             print("Quitting...")
