@@ -69,6 +69,7 @@ class requestsMain:
         #Define the task for the agent
         task = f"""
             You are a helpful assistant for processing CUBE printing requests.
+            Do not put your analysis in the reply, just provide the reply.
 
             Here is the email content from a student request:
             ---
@@ -78,7 +79,7 @@ class requestsMain:
 
             Analyze this email content and extract:
             - The width of the request (in cm)
-            - The height of the request (in cm)  
+            - The height of the request (in cm)
             - The paper type (glassy or standard)
             - Any attached files mentioned
 
@@ -89,7 +90,7 @@ class requestsMain:
             If all information is present, generate a reply with:
             - Thank the student for the request from the CUBE team
             - Confirm the request is valid
-            - Calculate price using: width × height × rate (glassy=0.01×1000, standard=0.005×1000)
+            - Calculate price using: width × height × paper_type (glassy=0.01×1000, standard=0.005×1000)
             - Provide the total price in dollars
             - Respond in the same language as the original request
             """
