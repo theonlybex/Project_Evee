@@ -1,0 +1,56 @@
+{
+  "personal_info": {
+    "full_name": "Bekzhan Abdimanapov",
+    "email": "abdimanapovb@gmail.com",
+    "linkedin_password": "Azesar123",
+    "phone": "+1 (209) 905-8695",
+    "linkedin_url": "https://linkedin.com/in/abecks",
+    "github_url": "https://github.com/theonlybex",
+    "portfolio_url": "https://theonlybex.github.io/",
+    "address": "Stockton, California, United States",
+    "nationality": "Kazakh"
+  },
+  "experience": {
+    "years_of_experience": "1-3 years",
+    "current_role": "Software Engineer",
+    "current_company": "Current Company",
+    "key_skills": ["Python", "Automation", "AI", "Web Development"],
+    "programming_languages": ["Python", "JavaScript", "SQL", "R"],
+    "frameworks": ["TensorFlow", "PyTorch", "React", "FastAPI"],
+    "certifications": []
+  },
+  "education": {
+    "degree": "Master's in Computer Science",
+    "university": "University of the Pacific",
+    "graduation_year": "2025",
+    "gpa": "3.5/4.0",
+    "relevant_coursework": ["Machine Learning", "Data Structures", "Algorithms", "Statistics"]
+  },
+  "job_preferences": {
+    "desired_roles": ["Software Engineer", "Automation Specialist"],
+    "preferred_locations": ["Remote", "San Francisco", "New York"],
+    "work_arrangements": ["Remote", "Hybrid", "On-site"],
+    "salary_range_min": "$30,000",
+    "salary_range_max": "$120,000",
+    "notice_period": "2 weeks",
+    "availability_date": "Immediately",
+    "willing_to_relocate": true,
+    "visa_sponsorship_needed": true
+  },
+  "cover_letter_templates": {
+    "default_template": "\nDear Hiring Manager,\n\nI am excited to apply for the {job_title} position at {company_name}. With {years_of_experience} of experience in {key_skills}, I am confident I can contribute significantly to your team.\n\nIn my current role as {current_role} at {current_company}, I have successfully led multiple projects. My expertise in {programming_languages} and {frameworks} aligns perfectly with your requirements.\n\nI am particularly drawn to {company_name} because of your innovative approach to technology. I would welcome the opportunity to discuss how my background can benefit your organization.\n\nThank you for your consideration.\n\nBest regards,\n{full_name}\n",
+    "startup_template": "\nHi there!\n\nI'm excited to apply for the {job_title} role at {company_name}! As someone passionate about innovation, I'm thrilled about the opportunity to contribute to your team.\n\nWith {years_of_experience} of experience in {key_skills}, I've built solutions that directly relate to your needs. I thrive in fast-paced environments and love taking on new challenges.\n\nWhat excites me most about {company_name} is your commitment to disrupting the industry. I'd love to discuss how my expertise can help drive your mission forward.\n\nLooking forward to hearing from you!\n\nBest,\n{full_name}\n",
+    "tech_giant_template": "\nDear {company_name} Hiring Team,\n\nI am writing to express my strong interest in the {job_title} position. With expertise in {programming_languages} and {years_of_experience} of progressive experience, I am eager to contribute to {company_name}'s continued innovation.\n\nMy background includes leading projects and delivering measurable results. I have consistently delivered solutions while maintaining excellent code quality.\n\nI am particularly impressed by {company_name}'s commitment to technological excellence and would be honored to contribute to your team's success.\n\nSincerely,\n{full_name}\n"
+  },
+  "cv_file_path": "CV/becks.resume.pdf",
+  "max_applications_per_session": 25,
+  "application_delay_seconds": 120,
+  "daily_application_limit": 25,
+  "auto_apply_enabled": true,
+  "save_applied_jobs": true,
+  "company_deduplication": true,
+  "session_break_minutes": 15,
+  "max_sessions_per_day": 1,
+  "test_mode": true,
+  "verbose_logging": true
+} 
