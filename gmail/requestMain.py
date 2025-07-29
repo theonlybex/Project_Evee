@@ -77,9 +77,9 @@ class requestsMain:
             CONTENT: {email_body}
             ---
 
-            Analyze this email content and extract:
-            - The width of the request (in cm)
-            - The height of the request (in cm)
+           Analyze this email content and extract:
+            - Dimensions of the request (height x width ) 
+            - Examples: 36" x 24" = 36 inches x 24 inches , 36' x 24' = 36 feet x 24 feet
             - The paper type (glassy or standard)
             - Any attached files mentioned
 
@@ -90,7 +90,7 @@ class requestsMain:
             If all information is present, generate a reply with:
             - Thank the student for the request from the CUBE team
             - Confirm the request is valid
-            - Calculate price using: width × height × paper_type (glassy=0.01×1000, standard=0.005×1000)
+            - Calculate price using: width × height × paper_type (glassy=3/12, standard=2/12)
             - Provide the total price in dollars
             - Respond in the same language as the original request
             """
