@@ -63,7 +63,7 @@ class requestsMain:
         }
     ]
         
-    def requestsProcessing(self, sender, email_body):
+    def requestsProcessing(self, sender, email_body, message_id, cc):
         """Login to the email account"""
 
         #Define the task for the agent
@@ -105,7 +105,7 @@ class requestsMain:
             print("✅ Reply generated successfully!")
 
             #Send the reply
-            self.send_reply_via_smtp(sender, "CUBE Request Response", reply_content)
+            self.send_reply_via_smtp(sender, "CUBE Request Response", reply_content, message_id, cc)
             
             
             return {
@@ -121,7 +121,7 @@ class requestsMain:
                 'history': None
             }
         
-    def send_reply_via_smtp(self, recipient, subject, reply_content):
+    def send_reply_via_smtp(self, recipient, subject, reply_content, message_id, cc):
         """Send reply email via SMTP using app password"""
         try:
             # Email configuration
@@ -134,16 +134,38 @@ class requestsMain:
             message["To"] = recipient
             message["Subject"] = f"Re: {subject}"
             
+            if message_id:
+                message["In-Reply-To"] = message_id
+                message["References"] = message_id
+
+            if cc:
+                cc_list = [email.strip() for email in cc.split(',')]
+                sender_email = os.getenv("GMAIL_EMAIL")
+                cc_list = [email for email in cc_list if email != sender_email]
+                if cc_list:
+                    message["Cc"] = ", ".join(cc_list)
+            
+            
+            
             # Add body
             message.attach(MIMEText(reply_content, "plain"))
             
+            #Create list of all recipients
+            all_recipients = [recipient]
+            if cc:
+                cc_list = [email.strip() for email in cc.split(',')]
+                sender_email = os.getenv("GMAIL_EMAIL")
+                cc_list = [email for email in cc_list if email != sender_email]
+                all_recipients.extend(cc_list)
+
+
             # Connect and send
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
             server.login(sender_email, app_password)
             server.send_message(message)
             server.quit()
             
-            print(f"✅ Reply sent to {recipient}")
+            print(f"✅ Reply sent to {all_recipients}")
             return True
             
         except Exception as e:

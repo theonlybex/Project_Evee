@@ -58,14 +58,14 @@ class EmailMonitor:
     
     
 
-    def requestProcessing(self, sender, email_body):
+    def requestProcessing(self, sender, email_body, message_id, cc):
         """Call requestMain when new email arrives"""
         try:
             # Create instance of your requestMain class
             processor = requestsMain()
             
             # Call your existing function
-            result = processor.requestsProcessing(sender, email_body)
+            result = processor.requestsProcessing(sender, email_body, message_id, cc)
             
             print(f"✅ Request processed: {result['success']}")
             
@@ -170,6 +170,8 @@ class EmailMonitor:
                             subject = self.decode_subject(email_message['Subject'])
                             sender = email_message['From']
                             email_body = self.extract_email_body(email_message)
+                            message_id = email_message.get('Message-ID', '')
+                            cc = email_message.get('Cc', '')
 
                             print(f"📧 NEW email from: {sender}")
                             print(f"📝 Subject: {subject}")
@@ -177,7 +179,7 @@ class EmailMonitor:
                             # Check if the email is a request
                             if self.is_request(subject, sender):
                                 print("🔍 This is a request. Processing...")
-                                self.requestProcessing(sender, email_body)
+                                self.requestProcessing(sender, email_body, message_id, cc)
                             else:
                                 print("ℹ️ Not a request email - ignoring")
                     # else: email is older than our starting point, ignore it
