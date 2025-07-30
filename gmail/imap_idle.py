@@ -6,6 +6,7 @@ import time
 import threading
 from email.header import decode_header
 from requestMain import requestsMain
+from conTracker import conTracker
 from dotenv import load_dotenv
 load_dotenv()
 import os
@@ -61,16 +62,18 @@ class EmailMonitor:
     def requestProcessing(self, sender, email_body, message_id, cc):
         """Call requestMain when new email arrives"""
         try:
-            # Create instance of your requestMain class
             processor = requestsMain()
-            
-            # Call your existing function
             result = processor.requestsProcessing(sender, email_body, message_id, cc)
             
-            print(f"✅ Request processed: {result['success']}")
-            
+            if result and 'success' in result:
+                print(f"✅ Request processed: {result['success']}")
+            else:
+                print(f"⚠️ Unexpected result format: {result}")
+                
         except Exception as e:
             print(f"❌ Error calling requestMain: {e}")
+            import traceback
+            traceback.print_exc()  # ← This will show the FULL error details
 
 
     async def start_monitoring(self):
@@ -163,21 +166,43 @@ class EmailMonitor:
                         status, msg_data = self.mail.fetch(email_id, '(RFC822)')
                         
                         if status == 'OK':
+                            # Parse email using standard IMAP RFC822 response format
+                            # Find the actual email content (usually in a tuple)
+                            email_content = None
+                            for item in msg_data:
+                                if isinstance(item, tuple) and len(item) == 2:
+                                    # Standard format: (header, email_content)
+                                    email_content = item[1]
+                                    break
+                            
+                            if email_content is None:
+                                # Fallback: try the old method for simple responses
+                                email_content = msg_data[0][1]
+                            
                             # Parse the email
-                            email_message = email.message_from_bytes(msg_data[0][1])
+                            email_message = email.message_from_bytes(email_content)
 
                             # Extract details
                             subject = self.decode_subject(email_message['Subject'])
                             sender = email_message['From']
                             email_body = self.extract_email_body(email_message)
                             message_id = email_message.get('Message-ID', '')
-                            cc = email_message.get('Cc', '')
+                            cc = email_message.get('Cc', '')    
 
-                            print(f"📧 NEW email from: {sender}")
-                            print(f"📝 Subject: {subject}")
 
+                            # Check if sender has pending conversation and email contains "yes"
+                            tracker = conTracker(sender, message_id)
+                            existing_conv = tracker.get_conversation(sender)
+                            if (existing_conv and 
+                                existing_conv['status'] == "pending" and 
+                                "yes" in email_body.lower()):
+                                
+                                print("🔍 Found 'yes' in email from pending conversation - treating as confirmation!")
+                                # Handle follow-up directly instead of going through requestProcessing
+                                processor = requestsMain()
+                                processor.followUp(sender, email_body, existing_conv, message_id, cc)
                             # Check if the email is a request
-                            if self.is_request(subject, sender):
+                            elif self.is_request(subject, sender):
                                 print("🔍 This is a request. Processing...")
                                 self.requestProcessing(sender, email_body, message_id, cc)
                             else:
@@ -195,19 +220,19 @@ class EmailMonitor:
                 for part in email_message.walk():
                     if part.get_content_type() == "text/plain":
                         payload = part.get_payload(decode=True)
-                        if payload:
+                        if payload and isinstance(payload, bytes):
                             return payload.decode('utf-8', errors='ignore')
                 # If no text/plain part found, try any text part
                 for part in email_message.walk():
                     if part.get_content_type().startswith("text/"):
                         payload = part.get_payload(decode=True)
-                        if payload:
+                        if payload and isinstance(payload, bytes):
                             return payload.decode('utf-8', errors='ignore')
                 return "[Multipart email - no readable content]"
             else:
                 # Handle simple text emails
                 payload = email_message.get_payload(decode=True)
-                if payload:
+                if payload and isinstance(payload, bytes):
                     return payload.decode('utf-8', errors='ignore')
                 else:
                     return "[Empty email body]"
@@ -226,8 +251,14 @@ class EmailMonitor:
         if subject:
             decoded = decode_header(subject)[0]
             if decoded[1]:
-                return decoded[0].decode(decoded[1])
-            return str(decoded[0])
+                # Only decode if it's bytes, not int
+                if isinstance(decoded[0], bytes):
+                    return decoded[0].decode(decoded[1])
+                else:
+                    return str(decoded[0])
+            else:
+                # No encoding, just convert to string
+                return str(decoded[0])
         return ""
     
     def reconnect(self):
