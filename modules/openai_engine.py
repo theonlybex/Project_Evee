@@ -1,5 +1,7 @@
 import os
+import re
 from openai import OpenAI
+from dotenv import load_dotenv
 from .file_manager import get_file_manager
 
 
@@ -7,6 +9,9 @@ class OpenAICodeEngine:
     def __init__(self):
         """Initialize the OpenAI code generation engine."""
         print("Initializing OpenAI engine...")
+        
+        # Load environment variables from .env file
+        load_dotenv()
         
         # Initialize file manager
         self.file_manager = get_file_manager()
@@ -23,13 +28,24 @@ class OpenAICodeEngine:
         self.client = OpenAI(api_key=self.api_key)
         print("OpenAI engine initialized successfully!")
 
+    def clean_code(self, text):
+        """Clean the response to extract only Python code."""
+        # Remove markdown code block markers
+        text = re.sub(r'```python\s*', '', text)
+        text = re.sub(r'```\s*$', '', text)
+        
+        # Remove any leading/trailing whitespace
+        text = text.strip()
+        
+        return text
+
     def generate_code(self):
         """Generate code based on the user's request."""
         # Instructions for the model
         instruction = """You are a personal in-house POC assistant.
         Your purpose is to receive text commands (e.g., "I want to watch some youtube videos")
         and write python code using pyautogui, pywinauto, selenium to complete the task.
-        Only return the Python code, no explanations or markdown formatting."""
+        Return ONLY the Python code, no explanations, no markdown formatting, no comments, no text before or after the code."""
 
         # Read the user command from the file manager
         user_request = self.file_manager.load_transcription()
@@ -54,6 +70,9 @@ class OpenAICodeEngine:
             
             # Extract the generated code
             code = response.choices[0].message.content.strip()
+            
+            # Clean the code
+            code = self.clean_code(code)
             return code
             
         except Exception as e:

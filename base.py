@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore", message="FP16 is not supported on CPU")
 
 try:
     from modules import voice_input as recording
-    from modules.deepseek_api_engine import DeepSeekAPIEngine
+    from modules.openai_engine import OpenAICodeEngine
     from modules.file_manager import get_file_manager
     import whisper
 except ImportError as e:
@@ -27,7 +27,7 @@ class VoiceAutomationGUI:
         # Initialize variables
         self.is_recording = False
         self.whisper_model = None
-        self.deepseek_engine = None
+        self.openai_engine = None
         self.current_transcription = ""
         self.generated_code = ""
         
@@ -148,8 +148,8 @@ class VoiceAutomationGUI:
                 self.progress.start()
                 self.whisper_model = whisper.load_model("base")
                 
-                self.update_status("Initializing DeepSeek engine...")
-                self.deepseek_engine = DeepSeekAPIEngine()
+                self.update_status("Initializing OpenAI engine...")
+                self.openai_engine = OpenAICodeEngine()
                 
                 self.progress.stop()
                 self.update_status("Ready")
@@ -233,8 +233,8 @@ class VoiceAutomationGUI:
             messagebox.showwarning("Warning", "No transcription available. Please record audio first.")
             return
         
-        if not self.deepseek_engine:
-            messagebox.showwarning("Warning", "DeepSeek engine not initialized. Please wait...")
+        if not self.openai_engine:
+            messagebox.showwarning("Warning", "OpenAI engine not initialized. Please wait...")
             return
         
         # Show confirmation dialog
@@ -254,7 +254,7 @@ class VoiceAutomationGUI:
         def generate_and_execute():
             try:
                 # Generate code
-                code = self.deepseek_engine.generate_code()
+                code = self.openai_engine.generate_code()
                 if code:
                     self.generated_code = code
                     
@@ -341,7 +341,7 @@ class VoiceAutomationGUI:
         settings_window.configure(bg='#f0f0f0')
         
         # API Key setting
-        api_frame = tk.LabelFrame(settings_window, text="DeepSeek API Settings", 
+        api_frame = tk.LabelFrame(settings_window, text="OpenAI API Settings", 
                                  font=('Arial', 12, 'bold'), bg='#f0f0f0')
         api_frame.pack(fill='x', padx=20, pady=10)
         
@@ -349,8 +349,8 @@ class VoiceAutomationGUI:
         api_key_entry = tk.Entry(api_frame, width=50, show='*')
         api_key_entry.pack(fill='x', padx=10, pady=5)
         
-        if self.deepseek_engine:
-            api_key_entry.insert(0, self.deepseek_engine.api_key)
+        if self.openai_engine:
+            api_key_entry.insert(0, self.openai_engine.api_key)
         
         # Recording settings
         record_frame = tk.LabelFrame(settings_window, text="Recording Settings", 
@@ -365,12 +365,14 @@ class VoiceAutomationGUI:
         # Save button
         def save_settings():
             new_api_key = api_key_entry.get()
-            if new_api_key and self.deepseek_engine:
-                self.deepseek_engine.api_key = new_api_key
-                self.deepseek_engine.headers["Authorization"] = f"Bearer {new_api_key}"
+            if new_api_key and self.openai_engine:
+                self.openai_engine.api_key = new_api_key
+                # Reinitialize OpenAI client with new API key
+                from openai import OpenAI
+                self.openai_engine.client = OpenAI(api_key=new_api_key)
             
             settings = {
-                "api_key": new_api_key,
+                "openai_api_key": new_api_key,
                 "silence_timeout": timeout_var.get()
             }
             if self.save_settings(settings):
